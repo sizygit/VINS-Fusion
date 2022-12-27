@@ -1,8 +1,8 @@
 /*******************************************************
  * Copyright (C) 2019, Aerial Robotics Group, Hong Kong University of Science and Technology
- * 
+ *
  * This file is part of VINS.
- * 
+ *
  * Licensed under the GNU General Public License v3.0;
  * you may not use this file except in compliance with the License.
  *
@@ -29,7 +29,7 @@ queue<sensor_msgs::ImageConstPtr> img0_buf;
 queue<sensor_msgs::ImageConstPtr> img1_buf;
 std::mutex m_buf;
 
-
+// 左目相机回调函数得到message
 void img0_callback(const sensor_msgs::ImageConstPtr &img_msg)
 {
     m_buf.lock();
@@ -37,6 +37,7 @@ void img0_callback(const sensor_msgs::ImageConstPtr &img_msg)
     m_buf.unlock();
 }
 
+// 左目相机回调函数得到message
 void img1_callback(const sensor_msgs::ImageConstPtr &img_msg)
 {
     m_buf.lock();
@@ -44,7 +45,7 @@ void img1_callback(const sensor_msgs::ImageConstPtr &img_msg)
     m_buf.unlock();
 }
 
-
+// 从msg获得图片
 cv::Mat getImageFromMsg(const sensor_msgs::ImageConstPtr &img_msg)
 {
     cv_bridge::CvImageConstPtr ptr;
@@ -70,9 +71,9 @@ cv::Mat getImageFromMsg(const sensor_msgs::ImageConstPtr &img_msg)
 // extract images with same timestamp from two topics
 void sync_process()
 {
-    while(1)
+    while (1)
     {
-        if(STEREO)
+        if (STEREO)
         {
             cv::Mat image0, image1;
             std_msgs::Header header;
@@ -83,12 +84,12 @@ void sync_process()
                 double time0 = img0_buf.front()->header.stamp.toSec();
                 double time1 = img1_buf.front()->header.stamp.toSec();
                 // 0.003s sync tolerance
-                if(time0 < time1 - 0.003)
+                if (time0 < time1 - 0.003)
                 {
                     img0_buf.pop();
                     printf("throw img0\n");
                 }
-                else if(time0 > time1 + 0.003)
+                else if (time0 > time1 + 0.003)
                 {
                     img1_buf.pop();
                     printf("throw img1\n");
@@ -101,11 +102,11 @@ void sync_process()
                     img0_buf.pop();
                     image1 = getImageFromMsg(img1_buf.front());
                     img1_buf.pop();
-                    //printf("find img0 and img1\n");
+                    // printf("find img0 and img1\n");
                 }
             }
             m_buf.unlock();
-            if(!image0.empty())
+            if (!image0.empty())
                 estimator.inputImage(time, image0, image1);
         }
         else
@@ -114,7 +115,7 @@ void sync_process()
             std_msgs::Header header;
             double time = 0;
             m_buf.lock();
-            if(!img0_buf.empty())
+            if (!img0_buf.empty())
             {
                 time = img0_buf.front()->header.stamp.toSec();
                 header = img0_buf.front()->header;
@@ -122,7 +123,7 @@ void sync_process()
                 img0_buf.pop();
             }
             m_buf.unlock();
-            if(!image.empty())
+            if (!image.empty())
                 estimator.inputImage(time, image);
         }
 
@@ -131,7 +132,7 @@ void sync_process()
     }
 }
 
-
+// 将imu的msg输入到estimator
 void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
 {
     double t = imu_msg->header.stamp.toSec();
@@ -147,7 +148,7 @@ void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
     return;
 }
 
-
+// 将特征点的点云msg输入到estimator
 void feature_callback(const sensor_msgs::PointCloudConstPtr &feature_msg)
 {
     map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> featureFrame;
@@ -162,24 +163,25 @@ void feature_callback(const sensor_msgs::PointCloudConstPtr &feature_msg)
         double p_v = feature_msg->channels[3].values[i];
         double velocity_x = feature_msg->channels[4].values[i];
         double velocity_y = feature_msg->channels[5].values[i];
-        if(feature_msg->channels.size() > 5)
+        if (feature_msg->channels.size() > 5)
         {
             double gx = feature_msg->channels[6].values[i];
             double gy = feature_msg->channels[7].values[i];
             double gz = feature_msg->channels[8].values[i];
             pts_gt[feature_id] = Eigen::Vector3d(gx, gy, gz);
-            //printf("receive pts gt %d %f %f %f\n", feature_id, gx, gy, gz);
+            // printf("receive pts gt %d %f %f %f\n", feature_id, gx, gy, gz);
         }
         ROS_ASSERT(z == 1);
         Eigen::Matrix<double, 7, 1> xyz_uv_velocity;
         xyz_uv_velocity << x, y, z, p_u, p_v, velocity_x, velocity_y;
-        featureFrame[feature_id].emplace_back(camera_id,  xyz_uv_velocity);
+        featureFrame[feature_id].emplace_back(camera_id, xyz_uv_velocity);
     }
     double t = feature_msg->header.stamp.toSec();
     estimator.inputFeature(t, featureFrame);
     return;
 }
 
+// 是否重启estimator，并重新设置参数
 void restart_callback(const std_msgs::BoolConstPtr &restart_msg)
 {
     if (restart_msg->data == true)
@@ -195,12 +197,12 @@ void imu_switch_callback(const std_msgs::BoolConstPtr &switch_msg)
 {
     if (switch_msg->data == true)
     {
-        //ROS_WARN("use IMU!");
+        // ROS_WARN("use IMU!");
         estimator.changeSensorType(1, STEREO);
     }
     else
     {
-        //ROS_WARN("disable IMU!");
+        // ROS_WARN("disable IMU!");
         estimator.changeSensorType(0, STEREO);
     }
     return;
@@ -210,12 +212,12 @@ void cam_switch_callback(const std_msgs::BoolConstPtr &switch_msg)
 {
     if (switch_msg->data == true)
     {
-        //ROS_WARN("use stereo!");
+        // ROS_WARN("use stereo!");
         estimator.changeSensorType(USE_IMU, 1);
     }
     else
     {
-        //ROS_WARN("use mono camera (left)!");
+        // ROS_WARN("use mono camera (left)!");
         estimator.changeSensorType(USE_IMU, 0);
     }
     return;
@@ -238,7 +240,7 @@ int main(int argc, char **argv)
     string config_file = argv[1];
     printf("config_file: %s\n", argv[1]);
 
-    readParameters(config_file);
+    readParameters(config_file); // 读取config.yaml文件参数
     estimator.setParameter();
 
 #ifdef EIGEN_DONT_PARALLELIZE
@@ -247,7 +249,7 @@ int main(int argc, char **argv)
 
     ROS_WARN("waiting for image and imu...");
 
-    registerPub(n);
+    registerPub(n);// 注册发布各种odometer的话题
 
     ros::Subscriber sub_imu;
     if(USE_IMU)
@@ -265,7 +267,7 @@ int main(int argc, char **argv)
     ros::Subscriber sub_imu_switch = n.subscribe("/vins_imu_switch", 100, imu_switch_callback);
     ros::Subscriber sub_cam_switch = n.subscribe("/vins_cam_switch", 100, cam_switch_callback);
 
-    std::thread sync_thread{sync_process};
+    std::thread sync_thread{sync_process};// 创建sync_thread线程,处理相机image
     ros::spin();
 
     return 0;

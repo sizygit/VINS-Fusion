@@ -50,6 +50,7 @@ void registerPub(ros::NodeHandle &n)
     cameraposevisual.setLineWidth(0.01);
 }
 
+// 将nav_msgs::Odometry(位置、姿态、速度)通过"imu_propagate"话题发布
 void pubLatestOdometry(const Eigen::Vector3d &P, const Eigen::Quaterniond &Q, const Eigen::Vector3d &V, double t)
 {
     nav_msgs::Odometry odometry;
