@@ -107,6 +107,15 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
             clahe->apply(rightImg, rightImg);
     }
     */
+    //左右目图像加入伽马增强提高角点数量
+    cur_img.convertTo(cur_img,CV_64F,1.0/255.0);//归一化处理
+    pow(cur_img,0.9,cur_img);//伽马增强
+    cur_img.convertTo(cur_img,CV_8U,255,0);
+    rightImg.convertTo(rightImg,CV_64F,1.0/255.0);
+    pow(rightImg,0.9,rightImg);
+    rightImg.convertTo(rightImg,CV_8U,255,0);
+    //在不同的场景可选择不同的伽马值
+
     cur_pts.clear();
 
     if (prev_pts.size() > 0)
