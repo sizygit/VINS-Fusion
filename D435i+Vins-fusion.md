@@ -27,6 +27,16 @@ rostopic echo /vins_estimator/path
 rosrun rqt_graph rqt_graph
 ```
 
+EVO评估
+
+```
+evo_traj euroc data.csv --save_as_tum
+evo_rpe tum vio_loop.csv vio.csv -r full -va --plot --plot_mode xyz
+evo_traj tum vio_loop.csv vio.csv --ref=vio.csv -p --plot_mode=xyz --align --correct_scale
+evo_traj tum vio_loop.csv vio.csv --ref=data.tum-p --plot_mode=xyz --align --correct_scale
+evo_traj bag /home/szy/Documents/DataSet/MH_02_easy.bag /imu --ref=/leica/position -va -p --plot_mode=xyz
+```
+
 
 
 ## Vins-fusion原理
@@ -113,3 +123,16 @@ PFH(Point Feature Histograms)
 map、	
 
 std::thread
+
+## EVO
+
+```
+evo_ape - 用于评估绝对位姿误差；
+evo_rpe- 用于评估相对位姿误差；
+evo_traj - 这个主要是用来画轨迹、输出轨迹文件、转换数据格式等功能；
+evo_res- 比较来自evo_ape或evo_rpe生成的一个或多个结果文件的工具；
+evo_fig - （实验）工具，用于重新打开序列化图（使用–serialize_plot保存）；
+evo_config - 这个主要用于evo工具全局设置和配置文件操作
+
+```
+
