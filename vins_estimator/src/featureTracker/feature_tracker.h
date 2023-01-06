@@ -67,7 +67,7 @@ public:
     vector<cv::Point2f> n_pts;
     vector<cv::Point2f> predict_pts;
     vector<cv::Point2f> predict_pts_debug;
-    vector<cv::Point2f> prev_pts, cur_pts, cur_right_pts;
+    vector<cv::Point2f> prev_pts, cur_pts, cur_right_pts , curLeftPtsTrackRight;
     vector<cv::Point2f> prev_un_pts, cur_un_pts, cur_un_right_pts;
     vector<cv::Point2f> pts_velocity, right_pts_velocity;
     vector<int> ids, ids_right;

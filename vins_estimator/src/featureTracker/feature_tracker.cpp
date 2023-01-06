@@ -241,6 +241,8 @@ map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> FeatureTracker::trackIm
             }
 
             ids_right = ids;
+            curLeftPtsTrackRight = cur_pts;
+            reduceVector(curLeftPtsTrackRight, status);
             reduceVector(cur_right_pts, status);
             reduceVector(ids_right, status);
             // only keep left-right pts
@@ -481,9 +483,10 @@ void FeatureTracker::drawTrack(const cv::Mat &imLeft, const cv::Mat &imRight,
         {
             cv::Point2f rightPt = curRightPts[i];
             rightPt.x += cols;
-            cv::circle(imTrack, rightPt, 2, cv::Scalar(0, 255, 0), 2);
-            //cv::Point2f leftPt = curLeftPtsTrackRight[i];
-            //cv::line(imTrack, leftPt, rightPt, cv::Scalar(0, 255, 0), 1, 8, 0);
+            // cv::circle(imTrack, rightPt, 2, cv::Scalar(0, 255, 0), 2);
+            cv::circle(imTrack, rightPt, 2, cv::Scalar(0, 255,90), 2);
+            cv::Point2f leftPt = curLeftPtsTrackRight[i];
+            // cv::line(imTrack, leftPt, rightPt, cv::Scalar(127, 255, 212), 1, 8, 0);
         }
     }
     
