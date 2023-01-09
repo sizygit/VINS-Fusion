@@ -20,27 +20,45 @@ image_height: 480
 estimate_extrinsic: 1   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
                         # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
 
+#body_T_cam0: !!opencv-matrix
+#   rows: 4
+#   cols: 4
+#   dt: d
+#   data: [ -5.7586305857286746e-03, -4.0463318787729019e-03,
+#       9.9997523237933461e-01, 2.0329267950355900e-02,
+#       -9.9998287214160420e-01, -1.0224590553211677e-03,
+#       -5.7628118925283633e-03, 7.9325209639615653e-03,
+#       1.0457519809151661e-03, -9.9999129084997906e-01,
+#       -4.0403746097850135e-03, 2.8559824645148020e-03, 0., 0., 0., 1. ]
+
+#ody_T_cam1: !!opencv-matrix
+#   rows: 4
+#   cols: 4
+#   dt: d
+#   data: [ -1.0021770212322867e-03, 3.6313480322730518e-04,
+#       9.9999943188700535e-01, 1.5285779565991807e-02,
+#       -9.9999216342926500e-01, -3.8303422615924010e-03,
+#       -1.0007788055728661e-03, -5.2435791444330505e-02,
+#       3.8299766679101843e-03, -9.9999259827824449e-01,
+#       3.6697063849344680e-04, 8.6931302450199057e-03, 0., 0., 0., 1. ]
+
 body_T_cam0: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d
-   data: [ -5.7586305857286746e-03, -4.0463318787729019e-03,
-       9.9997523237933461e-01, 2.0329267950355900e-02,
-       -9.9998287214160420e-01, -1.0224590553211677e-03,
-       -5.7628118925283633e-03, 7.9325209639615653e-03,
-       1.0457519809151661e-03, -9.9999129084997906e-01,
-       -4.0403746097850135e-03, 2.8559824645148020e-03, 0., 0., 0., 1. ]
+   data: [0.9999962659398743, -0.001602677342327152, -0.0022134885691080233, 0.00900976655339095,
+        0.0016164644175590368, 0.9999792183683, 0.006240983441079166, -0.0073183199951383695,
+        0.0022034402864489497, -0.006244538162382387, 0.9999780750566704, -0.022855708221833606,
+        0.0, 0.0, 0.0, 1.0]
 
 body_T_cam1: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d
-   data: [ -1.0021770212322867e-03, 3.6313480322730518e-04,
-       9.9999943188700535e-01, 1.5285779565991807e-02,
-       -9.9999216342926500e-01, -3.8303422615924010e-03,
-       -1.0007788055728661e-03, -5.2435791444330505e-02,
-       3.8299766679101843e-03, -9.9999259827824449e-01,
-       3.6697063849344680e-04, 8.6931302450199057e-03, 0., 0., 0., 1. ]
+   data: [0.9999986408936561, -0.0012096666275149184, -0.001120230998965463, -0.04105139986343465,
+        0.0012166289869963826, 0.9999798194334333, 0.0062354261912416975, -0.0073372616631712795,
+        0.0011126656050973406, -0.006236780622139878, 0.9999799320700005, -0.022860714793114346,
+        0.0, 0.0, 0.0, 1.0]
 
 #Multiple thread support
 multiple_thread: 1
@@ -63,7 +81,7 @@ acc_n: 0.1          # accelerometer measurement noise standard deviation. #0.2  
 gyr_n: 0.01         # gyroscope measurement noise standard deviation.     #0.05  0.004
 acc_w: 0.001         # accelerometer bias random work noise standard deviation.  #0.002
 gyr_w: 0.0001       # gyroscope bias random work noise standard deviation.     #4.0e-5
-g_norm: 9.805         # gravity magnitude
+g_norm: 9.82         # gravity magnitude
 
 #unsynchronization parameters
 estimate_td: 1                      # online estimate time offset between camera and imu
@@ -71,5 +89,5 @@ td: 0.00                             # initial value of time offset. unit: s. re
 
 #loop closure parameters
 load_previous_pose_graph: 0        # load and reuse previous pose graph; load from 'pose_graph_save_path'
-pose_graph_save_path: "/home/szy/Documents/DataSet/output/d435i/" # save and load path
-save_image: 1                   # save image in pose graph for visualization prupose; you can close this function by setting 0 
+pose_graph_save_path: "/home/szy/Documents/DataSet/output/d435i/pose_graph" # save and load path
+save_image: 0                   # save image in pose graph for visualization prupose; you can close this function by setting 0 
