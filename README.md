@@ -18,6 +18,7 @@ roslaunch vins vins_rviz.launch
 rosrun vins vins_node ~/vinsfusion_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml 
 (optional) rosrun loop_fusion loop_fusion_node ~/vinsfusion_ws/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml 
 rosbag play /home/szy/Documents/DataSet/MH_02_easy.bag
+rosbag play /home/szy/Documents/DataSet/room2_env1.bag
 ```
 
 打印相关话题与节点图
@@ -25,6 +26,21 @@ rosbag play /home/szy/Documents/DataSet/MH_02_easy.bag
 ```bash
 rostopic echo /vins_estimator/path
 rosrun rqt_graph rqt_graph
+```
+
+标定相机
+
+```bash
+rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.0188 image:=/camera/infra1/image_rect_raw
+# 1）X：标定靶在摄像头视野中的左右移动。 2）Y：标定靶在摄像头视野中的上下移动。 3）Size：标定靶在摄像头视野中的前后移动。 4）Skew：标定靶在摄像头视野中的倾斜转动。
+```
+
+[录包](https://charon-cheung.github.io/2019/06/24/ROS/ROS%20Kinetic%E7%9F%A5%E8%AF%86/rosbag%E7%9A%84%E4%BD%BF%E7%94%A8/#rosbag-record)
+
+```bash
+rosbag record /camera/infra1/image_rect_raw /camera/infra2/image_rect_raw  /camera/imu
+
+rosbag play /home/szy/Documents/DataSet/room1_env1.bag
 ```
 
 [EVO](https://gitcode.net/mirrors/michaelgrupp/evo?utm_source=csdn_github_accelerator)评估
@@ -46,6 +62,11 @@ evo_ape tum ../state_groundtruth_estimate0/real.tum vio.csv  -va --plot --plot_m
 evo_ape tum ../state_groundtruth_estimate0/real.tum vio_loop.csv  -va --plot --plot_mode xyz --save_results vio_loop.zip
 evo_ape tum ../state_groundtruth_estimate0/real.tum vio.csv -va --plot --plot_mode xyz --save_results vio.zip 
 evo_res vio.zip vio_loop.zip -p --use_filenames #--save_table compare_table.csv
+evo_traj tum vio_loop.csv vio.csv -p --plot_mode=xyz 
+evo_traj tum room2-optimized.csv --ref=room2-original.csv -p --plot_mode=xyz --align --correct_scale
+
+evo_traj tum room12-optimized.csv --ref=room12-openVins.csv -p --plot_mode=xyz --align --correct_scale
+evo_traj tum vio_loop_new.csv room12-openVins.csv -p --plot_mode=xyz 
 ```
 
 ## Vins-fusion原理
